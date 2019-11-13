@@ -1,0 +1,424 @@
+F2 := GF(2);
+
+FF4 := VectorSpace(F2, 4);
+v0 := FF4![0, 0, 0, 0];
+v1 := FF4![1, 0, 0, 0];
+v2 := FF4![0, 1, 0, 0];
+v3 := FF4![0, 0, 1, 0];
+v4 := FF4![0, 0, 0, 1];
+v5 := [v0, v1, v2, v3, v4];
+v6 := [v1, v2, v3, v4];
+FF8 := VectorSpace(F2, 8);
+u0 := FF8![0, 0, 0, 0, 0, 0, 0, 0];
+u1 := FF8![1, 0, 0, 0, 0, 0, 0, 0];
+u2 := FF8![0, 1, 0, 0, 0, 0, 0, 0];
+u3 := FF8![0, 0, 1, 0, 0, 0, 0, 0];
+u4 := FF8![0, 0, 0, 1, 0, 0, 0, 0];
+u5 := FF8![0, 0, 0, 0, 1, 0, 0, 0];
+u6 := FF8![0, 0, 0, 0, 0, 1, 0, 0];
+u7 := FF8![0, 0, 0, 0, 0, 0, 1, 0];
+u8 := FF8![0, 0, 0, 0, 0, 0, 0, 1];
+v8 := [u1, u2, u3, u4, u5, u6, u7, u8];
+
+//all permutation matrices
+Permt := function()
+V := [];
+	for i1, i2, i3, i4 in v6 do
+		v := Matrix([i1, i2, i3, i4]);
+		if Determinant(v) eq 1 then
+			Append(~V, v);
+		end if;
+	end for;
+	return V;
+end function;
+
+ll := Permt();
+
+Permtt := function()
+V := [];
+	for i1, i2, i3, i4,i5,i6,i7,i8 in v8 do
+		v := Matrix([i1, i2, i3, i4,i5,i6,i7,i8]);
+		if Determinant(v) eq 1 then
+			Append(~V, v);
+		end if;
+	end for;
+	return V;
+end function;
+
+lll := Permtt();
+
+
+//all nonsingular matrices
+NonSG := function()
+V := [];
+	for i1, i2, i3, i4 in FF4 do
+		v := Matrix([i1, i2, i3, i4]);
+		Append(~V, v);
+	end for;
+	return V;
+end function;
+
+l := NonSG();
+
+
+//Identity Matrix over F2
+I := Matrix(F2,\
+	[
+		[1, 0, 0, 0],\
+		[0, 1, 0, 0],\
+		[0, 0, 1, 0],\
+		[0, 0, 0, 1]\
+	]\
+);
+
+
+//Zero matrix over F2
+O := Matrix(F2,\
+	[
+		[0, 0, 0, 0],\
+		[0, 0, 0, 0],\
+		[0, 0, 0, 0],\
+		[0, 0, 0, 0]\
+	]\
+);
+
+
+//test if there exists singular block matrix 
+testM1 := function(M, n)
+	i1 := Nrows(M);
+	i := i1/n;
+	for iv in [1..i] do
+		for jv in [1..i] do
+			r1 := Submatrix(M, (iv-1)*n+1, (jv-1)*n+1, n, n);
+			if Determinant(r1) eq 0 then
+				return false;
+			end if;
+		end for;
+	end for;
+	return true;
+end function;
+
+
+//test if there exists  2X2 singular block matrix
+testM2 := function(M, n)
+	i1 := Nrows(M);
+	i := i1/n;
+	rowSet := Subsets({1..i}, 2);
+	colSet := Subsets({1..i}, 2);
+
+	for iv in rowSet do
+		for jv in colSet do
+			ivs := SetToSequence(iv);
+			jvs := SetToSequence(jv);
+			r1 := HorizontalJoin([Submatrix(M, (ivs[1]-1)*n+1, (jvs[1]-1)*n+1, n,n), Submatrix(M, (ivs[1]-1)*n+1, (jvs[2]-1)*n+1, n,n)]);
+			r2 := HorizontalJoin([Submatrix(M, (ivs[2]-1)*n+1, (jvs[1]-1)*n+1, n,n), Submatrix(M, (ivs[2]-1)*n+1, (jvs[2]-1)*n+1, n,n)]);
+			subM := VerticalJoin([r1, r2]);
+			
+			//print(subM);
+			//print(Determinant(subM));
+			
+			if Determinant(subM) eq 0 then
+				return false;
+			end if;
+		end for;
+	end for;
+
+	return true;
+
+end function;
+
+
+//test if there exists 3X3 singular block matrix
+testM3 := function(M, n)
+	i1 := Nrows(M);
+	i := i1/n;
+	rowSet := Subsets({1..i}, 3);
+	colSet := Subsets({1..i}, 3);
+
+	for iv in rowSet do
+		for jv in colSet do
+			ivs := SetToSequence(iv);
+			jvs := SetToSequence(jv);
+			
+			r1 := HorizontalJoin([Submatrix(M, (ivs[1]-1)*n+1, (jvs[1]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[1]-1)*n+1, (jvs[2]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[1]-1)*n+1, (jvs[3]-1)*n+1, n,n)]);
+								  
+			r2 := HorizontalJoin([Submatrix(M, (ivs[2]-1)*n+1, (jvs[1]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[2]-1)*n+1, (jvs[2]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[2]-1)*n+1, (jvs[3]-1)*n+1, n,n)]);
+								  
+			r3 := HorizontalJoin([Submatrix(M, (ivs[3]-1)*n+1, (jvs[1]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[3]-1)*n+1, (jvs[2]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[3]-1)*n+1, (jvs[3]-1)*n+1, n,n)]);
+								  					  
+			subM := VerticalJoin([r1, r2, r3]);
+			
+			//print(subM);
+			//print(Determinant(subM));
+			
+			if Determinant(subM) eq 0 then
+				return false;
+			end if;
+		end for;
+	end for;
+
+	return true;
+
+end function;
+
+
+//test if matrix M is MDS or not
+IsMDS_Branch5 := function(M, n)
+	return (testM1(M, n) and testM2(M, n) and testM3(M, n) and (Determinant(M) ne 0));
+end function;
+
+
+//give the Hamming Weight of matrix M
+HW := function(M)
+	w := 0;
+	for i in [1..Nrows(M)] do
+		for j in [1..Ncols(M)] do
+			if M[i][j] ne F2!0 then
+				w := w + 1;
+			end if;
+		end for;
+	end for;
+	return w;
+end function;
+//number of nonzero rows
+Hw := function(M)
+	w1 := 0;
+	for i in [1..Nrows(M)] do
+		
+		if M[i] eq O[1] then
+			w1 := w1+1;
+		end if;		
+	end for;
+	return Nrows(M)-w1;
+end function;
+
+
+//give the number of zero rows of matrix M
+ZR := function(M)
+	w := 0;
+	for i in [1..4] do
+		if (M[i][1] eq 0) and (M[i][2] eq 0) and (M[i][3] eq 0) and (M[i][4] eq 0) then
+			w := w+1;
+		end if;
+	end for;
+	return w;
+end function;
+
+
+//all 4X4 nonsigular matrices with one XOR count
+NOX := function()
+V := [];
+	for i1, i2, i3, i4 in FF4 do
+					v := Matrix([i1, i2, i3, i4]);
+					if HW(v) ne 5 then
+						continue;
+					end if;
+					if Determinant(v) eq 1 then
+						Append(~V,v);
+					end if;				
+	end for;
+	return V;
+end function;
+
+NOXS := NOX();
+
+
+//all 8X8 nonsingular matrices with two XOR count constructed by 4 nonzero 4X4 submatrices
+NOXX := function()
+V := [];
+	for i in [1..40320] do
+		v := lll[i];
+		for i1, i2 in [1..64] do
+			if i1 eq i2 then 
+				continue;
+			end if;
+			v1 := v;
+			a1 := (i1+7) div 8;
+			a2 := (i2+7) div 8;
+			b1 := (i1-1) mod 8 + 1;
+			b2 := (i2-1) mod 8 + 1;
+			if v[a1,b1] ne 0 or v[a2, b2] ne 0 then
+				continue;
+			end if;
+			v1[a1,b1] := 1;
+			v1[a1,b2] := 1;
+			Append(~V,v1);
+			print #V;
+			if a1 eq a2 then				
+				for i4 in [1..8] do
+					if Weight(v1[i4]+v1[a1]) eq 2 then
+						v4 := v1;
+						v4[i4, b1] := 1;
+						v4[i4, b2] := 1;
+						Append(~V, v4);
+					end if;
+				end for;										 
+			end if;
+		end for;
+	end for;
+	return V;
+end function;
+
+NOXSS := NOXX();
+
+
+//find the equivalent class of permutation matrices
+EC := function()
+	S := [];
+	for i in [1..20160] do
+		s := {};
+		for j in [1..20160] do
+			Include(~s, VV[j]^-1*VV[i]*VV[j]);
+		end for;
+		if s notin S then
+			Append(~S, s);
+		end if;
+		if #S eq 14 then
+			break i;
+		end if;
+	//print i;
+	end for;
+	return S;
+end function;
+
+Ec:=EC();
+
+
+//3.3 search for global smallest iterative MDS matrix
+Search := function()
+//V := [];
+x := 32;
+	for i1 in [1..24] do
+		for i2 in [2..65536] do
+			r1 := HorizontalJoin([l[i2], I, O, O]);
+			r2 := HorizontalJoin([O,O,I,O]);
+			r3 := HorizontalJoin([O,O,O,I]);
+			r4 := HorizontalJoin([ll[i1], O, O, O]);
+			n := VerticalJoin([r1,r2,r3,r4]);
+			for t in [1..65535] do
+				M := n^t;
+				if IsMDS_Branch5(M, 4) then
+					//Append(~V, [i1, i2, t]);
+					if HW(n) lt x then
+						x := HW(n);
+						print [i1, i2, t];
+					end if;
+				end if;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+
+
+//Lemma 12 search
+//Xor(M|A_1) = 1, take Case II as example
+Search12 := function()
+	for t in [4..65535] do
+		for i1,i2,i3 in [1..24] do
+			for i4 in [1..288] do
+				for i5 in [2..65536] do
+					if Hw(l[i5]) ne 1 then
+						continue i5;
+					end if;
+					r1 := HorizontalJoin([l[i5], ll[i1], O, O]);
+					r2 := HorizontalJoin([O,O,ll[i2],O]);
+					r3 := HorizontalJoin([O,O,O,ll[i3]]);
+					r4 := HorizontalJoin([NOXS[288], O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then 
+						return [i1, i2, i3 ,i4 ,i5, t];
+					end if;
+				end for;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+//Xor(M|A_1) = 2
+Search12 := function()
+	for t in [4..65535] do
+		for i1,i2,i3 in [1..24] do
+			for i4 in [1..288] do
+				for i5 in [2..65536] do
+					if Hw(l[i5]) gt 2 then
+						continue i5;
+					end if;
+					r1 := HorizontalJoin([l[i5], NOXS[i5], O, O]);
+					r2 := HorizontalJoin([O,O,ll[i2],O]);
+					r3 := HorizontalJoin([O,O,O,ll[i3]]);
+					r4 := HorizontalJoin([ll[i1], O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then 
+						return [i1, i2, i3 ,i4 ,i5, t];
+					end if;
+				end for;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+
+
+//Lemma 13 search
+//Case I
+Search13 := function()
+	for t in [4..65535] do
+		for i1,i2,i3,i4 in [1..24] do
+			//for i4 in [1..288] do
+				for i5 in [2..65536] do
+					if Hw(l[i5]) ne 1 then
+						continue i5;
+					end if;
+					for i6 in [2..65536] do
+						if Hw(l[i6]) ne 1 then
+							continue i6;
+						end if;
+						r1 := HorizontalJoin([l[i5], ll[i1], l[i6], O]);
+						r2 := HorizontalJoin([O,O,ll[i2],O]);
+						r3 := HorizontalJoin([O,O,O,ll[i3]]);
+						r4 := HorizontalJoin([ll[i4], O, O, O]);
+						n := VerticalJoin([r1,r2,r3,r4]);
+						M := n^t;
+						if IsMDS_Branch5(M, 4) then 
+							return [i1, i2, i3 ,i4 ,i5, i6, t];
+						end if;
+					end for;
+				end for;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+//Case II
+Search13 := function()
+	for t in [1..65535] do
+		for i1, i2 in [1..24] do
+			for i3 in NOXSS do
+				a1 := Submatrix(i3, 1, 1, 4, 4);
+				a2 := Submatrix(i3, 1, 5, 4, 4);
+				a3 := Submatrix(i3, 5, 1, 4, 4);
+				a4 := Submatrix(i3, 5, 5, 4, 4);
+				r1 := HorizontalJoin([O, a1, a2, O]);
+				r2 := HorizontalJoin([O, a3, a4, O]);
+				r3 := HorizontalJoin([O, O, O, ll[i1]]);
+				r4 := HorizontalJoin([ll[i2], O, O, O]);
+				n := VerticalJoin([r1,r2,r3,r4]);
+				M := n^t;
+				if IsMDS_Branch5(M, 4) then
+					print [t, i1, i2];
+					return i3;
+				end if;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
