@@ -1,0 +1,263 @@
+F2 := GF(2);
+
+FF4 := VectorSpace(F2, 4);
+v0 := FF4![0, 0, 0, 0];
+v1 := FF4![1, 0, 0, 0];
+v2 := FF4![0, 1, 0, 0];
+v3 := FF4![0, 0, 1, 0];
+v4 := FF4![0, 0, 0, 1];
+v5 := [v0, v1, v2, v3, v4];
+v6 := [v1, v2, v3, v4];
+FF8 := VectorSpace(F2, 8);
+u0 := FF8![0, 0, 0, 0, 0, 0, 0, 0];
+u1 := FF8![1, 0, 0, 0, 0, 0, 0, 0];
+u2 := FF8![0, 1, 0, 0, 0, 0, 0, 0];
+u3 := FF8![0, 0, 1, 0, 0, 0, 0, 0];
+u4 := FF8![0, 0, 0, 1, 0, 0, 0, 0];
+u5 := FF8![0, 0, 0, 0, 1, 0, 0, 0];
+u6 := FF8![0, 0, 0, 0, 0, 1, 0, 0];
+u7 := FF8![0, 0, 0, 0, 0, 0, 1, 0];
+u8 := FF8![0, 0, 0, 0, 0, 0, 0, 1];
+v8 := [u1, u2, u3, u4, u5, u6, u7, u8];
+
+//all permutation matrices
+Permt := function()
+V := [];
+	for i1, i2, i3, i4 in v6 do
+		v := Matrix([i1, i2, i3, i4]);
+		if Determinant(v) eq 1 then
+			Append(~V, v);
+		end if;
+	end for;
+	return V;
+end function;
+
+ll := Permt();
+
+
+//all matrices
+Allm := function()
+V := [];
+	for i1, i2, i3, i4 in FF4 do
+		v := Matrix([i1, i2, i3, i4]);
+		Append(~V, v);
+	end for;
+	return V;
+end function;
+
+l := Allm();
+
+
+//all nonsingular matrices
+Allof := function()
+V := [];
+	for i1, i2, i3, i4 in FF4 do
+		v := Matrix([i1, i2, i3, i4]);
+		if  Determinant(v) eq 1 then
+			Append(~V, v);
+		end if;
+	end for;
+	return V;
+end function;
+
+VV := Allof();
+
+
+//Identity Matrix over F2
+I := Matrix(F2,\
+	[
+		[1, 0, 0, 0],\
+		[0, 1, 0, 0],\
+		[0, 0, 1, 0],\
+		[0, 0, 0, 1]\
+	]\
+);
+
+
+//Zero matrix over F2
+O := Matrix(F2,\
+	[
+		[0, 0, 0, 0],\
+		[0, 0, 0, 0],\
+		[0, 0, 0, 0],\
+		[0, 0, 0, 0]\
+	]\
+);
+
+
+//test if there exists singular block matrix 
+testM1 := function(M, n)
+	i1 := Nrows(M);
+	i := i1/n;
+	for iv in [1..i] do
+		for jv in [1..i] do
+			r1 := Submatrix(M, (iv-1)*n+1, (jv-1)*n+1, n, n);
+			if Determinant(r1) eq 0 then
+				return false;
+			end if;
+		end for;
+	end for;
+	return true;
+end function;
+
+
+//test if there exists  2X2 singular block matrix
+testM2 := function(M, n)
+	i1 := Nrows(M);
+	i := i1/n;
+	rowSet := Subsets({1..i}, 2);
+	colSet := Subsets({1..i}, 2);
+
+	for iv in rowSet do
+		for jv in colSet do
+			ivs := SetToSequence(iv);
+			jvs := SetToSequence(jv);
+			r1 := HorizontalJoin([Submatrix(M, (ivs[1]-1)*n+1, (jvs[1]-1)*n+1, n,n), Submatrix(M, (ivs[1]-1)*n+1, (jvs[2]-1)*n+1, n,n)]);
+			r2 := HorizontalJoin([Submatrix(M, (ivs[2]-1)*n+1, (jvs[1]-1)*n+1, n,n), Submatrix(M, (ivs[2]-1)*n+1, (jvs[2]-1)*n+1, n,n)]);
+			subM := VerticalJoin([r1, r2]);
+			
+			//print(subM);
+			//print(Determinant(subM));
+			
+			if Determinant(subM) eq 0 then
+				return false;
+			end if;
+		end for;
+	end for;
+
+	return true;
+
+end function;
+
+
+//test if there exists 3X3 singular block matrix
+testM3 := function(M, n)
+	i1 := Nrows(M);
+	i := i1/n;
+	rowSet := Subsets({1..i}, 3);
+	colSet := Subsets({1..i}, 3);
+
+	for iv in rowSet do
+		for jv in colSet do
+			ivs := SetToSequence(iv);
+			jvs := SetToSequence(jv);
+			
+			r1 := HorizontalJoin([Submatrix(M, (ivs[1]-1)*n+1, (jvs[1]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[1]-1)*n+1, (jvs[2]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[1]-1)*n+1, (jvs[3]-1)*n+1, n,n)]);
+								  
+			r2 := HorizontalJoin([Submatrix(M, (ivs[2]-1)*n+1, (jvs[1]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[2]-1)*n+1, (jvs[2]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[2]-1)*n+1, (jvs[3]-1)*n+1, n,n)]);
+								  
+			r3 := HorizontalJoin([Submatrix(M, (ivs[3]-1)*n+1, (jvs[1]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[3]-1)*n+1, (jvs[2]-1)*n+1, n,n), \
+								  Submatrix(M, (ivs[3]-1)*n+1, (jvs[3]-1)*n+1, n,n)]);
+								  					  
+			subM := VerticalJoin([r1, r2, r3]);
+			
+			//print(subM);
+			//print(Determinant(subM));
+			
+			if Determinant(subM) eq 0 then
+				return false;
+			end if;
+		end for;
+	end for;
+
+	return true;
+
+end function;
+
+
+//test if matrix M is MDS or not
+IsMDS_Branch5 := function(M, n)
+	return (testM1(M, n) and testM2(M, n) and testM3(M, n) and (Determinant(M) ne 0));
+end function;
+
+
+//give the Hamming Weight of matrix M
+HW := function(M)
+	w := 0;
+	for i in [1..Nrows(M)] do
+		for j in [1..Ncols(M)] do
+			if M[i][j] ne F2!0 then
+				w := w + 1;
+			end if;
+		end for;
+	end for;
+	return w;
+end function;
+//number of nonzero rows
+Hw := function(M)
+	w1 := 0;
+	for i in [1..Nrows(M)] do
+		
+		if M[i] eq O[1] then
+			w1 := w1+1;
+		end if;		
+	end for;
+	return Nrows(M)-w1;
+end function;
+
+
+//give the number of zero rows of matrix M
+ZR := function(M)
+	w := 0;
+	for i in [1..4] do
+		if (M[i][1] eq 0) and (M[i][2] eq 0) and (M[i][3] eq 0) and (M[i][4] eq 0) then
+			w := w+1;
+		end if;
+	end for;
+	return w;
+end function;
+
+
+//all 4X4 nonsigular matrices with one XOR count
+NOX := function()
+V := [];
+	for i1, i2, i3, i4 in FF4 do
+					v := Matrix([i1, i2, i3, i4]);
+					if HW(v) ne 5 then
+						continue;
+					end if;
+					if Determinant(v) eq 1 then
+						Append(~V,v);
+					end if;				
+	end for;
+	return V;
+end function;
+
+NOXS := NOX();
+
+
+//find the equivalent class of permutation matrices
+EC := function()
+	S := [];
+	for i in [1..20160] do
+		s := {};
+		for j in [1..20160] do
+			Include(~s, VV[j]^-1*VV[i]*VV[j]);
+		end for;
+		if s notin S then
+			Append(~S, s);
+		end if;
+		if #S eq 14 then
+			break i;
+		end if;
+	//print i;
+	end for;
+	return S;
+end function;
+
+Ec:=EC();
+
+Ecc := [];
+for i in [1..14] do
+	Append(~Ecc, Random(Ec[i]));
+end for;
+
+
+
+
+

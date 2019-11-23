@@ -1,0 +1,23 @@
+
+
+//Search for minimal XOR count of minimal iteration
+Search16 := function()
+for t in [1..65535] do
+	for i1 in [1..14] do
+		for i2 in [2..65536] do
+			r1 := HorizontalJoin([O, Ecc[i1], l[i2], O]);
+			r2 := HorizontalJoin([O, O, I, O]);
+			r3 := HorizontalJoin([O, O, O, I]);
+			r4 := HorizontalJoin([I, O, O, O]);
+			n := VerticalJoin([r1, r2, r3, r4]);
+			M := n^t;
+			if IsMDS_Branch5(M, 4) then
+				return [i1, i2, t];
+			end if;
+		end for;
+	end for;
+end for;
+return true;
+end function;
+
+return [14, 17773, 14]

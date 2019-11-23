@@ -1,0 +1,194 @@
+//all nonsingular matrices with 2 nonzero row-block in its first row and seconde row
+SortZ := function()
+V := [];
+	for i2 in [1..65536] do
+		if Hw(l[i2]) le 2 and l[i2][3] eq v0 and l[i2][4] eq v0 and Weight(l[i2][1]) le 2 and Weight(l[i2][2]) le 2 then
+			Append(~V, l[i2]);
+		end if;
+	end for;
+	return V;
+end function;
+
+L1 := SortZ();
+
+//Case I
+Search13 := function()
+	for t in [4..65535] do
+		for i1,i2,i3,i4 in [1..24] do			
+				for i5,i6 in [2..65536] do										
+						r1 := HorizontalJoin([L1[i5], ll[i1], L1[i6], O]);
+						r2 := HorizontalJoin([O,O,I,O]);
+						r3 := HorizontalJoin([O,O,O,I]);
+						r4 := HorizontalJoin([I, O, O, O]);
+						n := VerticalJoin([r1,r2,r3,r4]);
+						M := n^t;
+						if IsMDS_Branch5(M, 4) then 
+							return [i1, i5, i6, t];
+						end if;					
+				end for;			
+		end for;
+	end for;
+	return true;
+end function;
+
+
+//Case II and number of heavy row in first row-block is 2
+Search13a := function()
+	for i1,i2,i3,i4 in FF8 do
+		if i1 eq i2 or i3 eq i4 then
+			continue;
+		end if;	
+		v81 := i1 + i2;
+		v82 := i3 + i4;
+		if v81 ne v82 then			
+			for i5, i6, i7, i8, i9, ia in FF8 do
+				m1 := Matrix([v81,v82,i5,i6,i7,i8,i9,ia]);	
+				if Determinant(m1) eq 0 then
+					continue;
+				end if;
+				V1 := Submatrix(m1, 1, 1, 4, 4);
+				V2 := Submatrix(m1, 1, 5, 4, 4);
+				V3 := Submatrix(m1, 5, 1, 4, 4);
+				V4 := Submatrix(m1, 5, 5, 4, 4);
+				if V1 eq O or V2 eq O or V3 eq O or V4 eq O then
+					continue;				
+				end if;
+				r1 := HorizontalJoin([O, V1, V2, O]);
+				r2 := HorizontalJoin([O, V3, V4, O]);
+				r3 := HorizontalJoin([O, O, O, I]);
+				r4 := HorizontalJoin([I, O, O, O]);
+				n := VerticalJoin([r1,r2,r3,r4]);
+				M := n^t;
+				if IsMDS_Branch5(M, 4) then				
+					return [i1, i2, i3, i4, i5, i6, i7, i8, i9, ia];
+				end if;
+			end for;
+		else 				
+			for ib in [1..8] do				
+				if v81[ib] eq 0 then
+					v81[ib] := 1;
+				end if;
+				for i5, i6, i7, i8, i9, ia in FF8 do
+					m1 := Matrix([v81,v82,i5,i6,i7,i8,i9,ia]);	
+					if Determinant(m1) eq 0 then
+						continue;
+					end if;
+					V1 := Submatrix(m1, 1, 1, 4, 4);
+					V2 := Submatrix(m1, 1, 5, 4, 4);
+					V3 := Submatrix(m1, 5, 1, 4, 4);
+					V4 := Submatrix(m1, 5, 5, 4, 4);
+					if V1 eq O or V2 eq O or V3 eq O or V4 eq O then
+						continue;				
+					end if;
+					r1 := HorizontalJoin([O, V1, V2, O]);
+					r2 := HorizontalJoin([O, V3, V4, O]);
+					r3 := HorizontalJoin([O, O, O, I]);
+					r4 := HorizontalJoin([I, O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then				
+						return [i1, i2, i3, i4, i5, i6, i7, i8, i9, ia];
+					end if;
+				end for;										 
+			end for;
+		end if;
+	end for;
+	return true;
+end function;
+
+//Case II and number of heavy row in first row-block is 1
+Search13b := function()
+	for i1,i2,i3 in FF8 do		
+		v81 := i1 + i2 + i3;
+		if Weight(v81) ne 3 then
+			continue;
+		end if;				
+			for i4, i5, i6, i7, i8, i9, ia in FF8 do
+				m1 := Matrix([v81,i4,i5,i6,i7,i8,i9,ia]);	
+				if Determinant(m1) eq 0 then
+					continue;
+				end if;
+				V1 := Submatrix(m1, 1, 1, 4, 4);
+				V2 := Submatrix(m1, 1, 5, 4, 4);
+				V3 := Submatrix(m1, 5, 1, 4, 4);
+				V4 := Submatrix(m1, 5, 5, 4, 4);
+				if V1 eq O or V2 eq O or V3 eq O or V4 eq O then
+					continue;				
+				end if;
+				r1 := HorizontalJoin([O, V1, V2, O]);
+				r2 := HorizontalJoin([O, V3, V4, O]);
+				r3 := HorizontalJoin([O, O, O, I]);
+				r4 := HorizontalJoin([I, O, O, O]);
+				n := VerticalJoin([r1,r2,r3,r4]);
+				M := n^t;
+				if IsMDS_Branch5(M, 4) then				
+					return [i1, i2, i3, i4, i5, i6, i7, i8, i9, ia];
+				end if;
+			end for;
+	end for;
+	return true;
+end function;
+
+//Case II and number of heavy row in first row-block and second row-block is both 1
+Search13c := function()
+	for i1,i2,i3,i4 in FF8 do
+		if i1 eq i2 or i3 eq i4 then
+			continue;
+		end if;	
+		v81 := i1 + i2;
+		v82 := i3 + i4;
+		if v81 ne v82 then			
+			for i5, i6, i7, i8, i9, ia in FF8 do
+				m1 := Matrix([v81,i5,i6,i7, v82, i8,i9,ia]);	
+				if Determinant(m1) eq 0 then
+					continue;
+				end if;
+				V1 := Submatrix(m1, 1, 1, 4, 4);
+				V2 := Submatrix(m1, 1, 5, 4, 4);
+				V3 := Submatrix(m1, 5, 1, 4, 4);
+				V4 := Submatrix(m1, 5, 5, 4, 4);
+				if V1 eq O or V2 eq O or V3 eq O or V4 eq O then
+					continue;				
+				end if;
+				r1 := HorizontalJoin([O, V1, V2, O]);
+				r2 := HorizontalJoin([O, V3, V4, O]);
+				r3 := HorizontalJoin([O, O, O, I]);
+				r4 := HorizontalJoin([I, O, O, O]);
+				n := VerticalJoin([r1,r2,r3,r4]);
+				M := n^t;
+				if IsMDS_Branch5(M, 4) then				
+					return [i1, i2, i3, i4, i5, i6, i7, i8, i9, ia];
+				end if;
+			end for;
+		else 				
+			for ib in [1..8] do				
+				if v81[ib] eq 0 then
+					v81[ib] := 1;
+				end if;
+				for i5, i6, i7, i8, i9, ia in FF8 do
+					m1 := Matrix([v81,i5,i6,i7, v82, i8,i9,ia]);	
+					if Determinant(m1) eq 0 then
+						continue;
+					end if;
+					V1 := Submatrix(m1, 1, 1, 4, 4);
+					V2 := Submatrix(m1, 1, 5, 4, 4);
+					V3 := Submatrix(m1, 5, 1, 4, 4);
+					V4 := Submatrix(m1, 5, 5, 4, 4);
+					if V1 eq O or V2 eq O or V3 eq O or V4 eq O then
+						continue;				
+					end if;
+					r1 := HorizontalJoin([O, V1, V2, O]);
+					r2 := HorizontalJoin([O, V3, V4, O]);
+					r3 := HorizontalJoin([O, O, O, I]);
+					r4 := HorizontalJoin([I, O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then				
+						return [i1, i2, i3, i4, i5, i6, i7, i8, i9, ia];
+					end if;
+				end for;										 
+			end for;
+		end if;
+	end for;
+	return true;
+end function;

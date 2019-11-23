@@ -1,0 +1,222 @@
+//Lemma 18, A3,2 either has a unique heavy row with weight 2 or a permutation matrix, A_R has at most 1 heavy row with weight over 2
+ProbMatrixA := function()	
+	l := [];
+	sss := [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4], [5, 6], [5, 7], [5, 8], [6, 7], [6, 8], [7, 8], [1, 5], [1, 6], [1, 7], [1, 8], [2, 5], [2, 6], [2, 7], [2, 8], [3, 5], [3, 6], [3, 7], [3, 8], [4, 5], [4, 6], [4, 7], [4, 8]];
+	for t1 in [1..6] do
+		for t2 in [13..28] do
+			for t3 in [t2+1..28] do
+				for t4 in [t3+1..28] do
+					u := v8;
+					u11 := u[sss[t1][1]] + u[sss[t1][2]];
+					u22 := u[sss[t2][1]] + u[sss[t2][2]];
+					u33 := u[sss[t3][1]] + u[sss[t3][2]];
+					u44 := u[sss[t4][1]] + u[sss[t4][2]];
+					u cat:= [u11, u22, u33, u44];
+					for t5 in [1..8] do
+						m := Matrix([u22, u33, u44]);
+						t7 := u11 + u[t5];
+						if (t7 in u) or (Weight(t7) le 2) then 
+							continue;
+						else Append(~u, t7);
+						end if;
+						m := VerticalJoin(m, t7);
+						if Determinant(ColumnSubmatrix(m, 4))*Determinant(ColumnSubmatrix(m, 5, 4)) eq 0 then
+							continue;
+						end if;
+						for i1, i2, i3 in v6 do
+							m3 := Matrix([i1, i2, i3]);
+							v := VerticalJoin(ColumnSubmatrix(Matrix([u11]), 4), m3);
+							if Determinant(v) eq 1 then
+								m2 := [ColumnSubmatrix(m, 4), ColumnSubmatrix(m, 5, 4), v];
+								Append(~l, m2);
+							end if;
+						end for;
+					end for;					
+				end for;
+			end for;
+		end for;
+	end for;
+return l;
+end function;
+
+zA := ProbMatrixA();
+
+Search18A := function()
+	for i1 in [1..3456] do
+		for i2, i3, i4 in [1..24] do
+			m1 := HorizontalJoin([ll[i2], O, I, O]);
+			m2 := HorizontalJoin([O, ll[i3]*zA[i1][1], O, ll[i3]*zA[i1][2]]);
+			m3 := HorizontalJoin([O, ll[i4]*zA[i1][3], O, O]);
+			m4 := HorizontalJoin([I, O, O, O]);
+			n := VerticalJoin([m1, m2, m3, m4]);
+			M := n^4;
+			if IsMDS_Branch5(M, 4) then
+				return [i1, i2, i3];
+			end if;
+		end for;
+	end for;
+	return true;
+end function;
+
+
+//A3,2 is permutation matrix and SLP program has totally 4 direct XOR operations(weight of 2)
+ProbMatrixB := function()
+	l := [];
+	sss := [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4], [5, 6], [5, 7], [5, 8], [6, 7], [6, 8], [7, 8], [1, 5], [1, 6], [1, 7], [1, 8], [2, 5], [2, 6], [2, 7], [2, 8], [3, 5], [3, 6], [3, 7], [3, 8], [4, 5], [4, 6], [4, 7], [4, 8]];	//t
+	for t1 in [13..28] do
+		for t2 in [t1+1..28] do
+			for t3 in [t2+1..28] do
+				for t4 in [t3+1..28] do
+					u := v8;					
+					u11 := u[sss[t1][1]] + u[sss[t1][2]];
+					u22 := u[sss[t2][1]] + u[sss[t2][2]];
+					u33 := u[sss[t3][1]] + u[sss[t3][2]];
+					u44 := u[sss[t4][1]] + u[sss[t4][2]];
+					u cat:= [u11, u22, u33, u44];
+					for t5 in [1..11] do
+						for t6 in [t5+1..12] do
+							m := Matrix([u11, u22, u33, u44]);
+							t7 := u[t5] + u[t6];
+							if (t7 in u) or (Weight(t7) le 2) then 
+								continue;
+							else Append(~u, t7);
+							end if;
+							m := VerticalJoin(m, t7);						
+								ml2 := Submatrix(m, [1, 2, 3, 5], [1, 2, 3, 4]);
+								mr2 := Submatrix(m, [1, 2 ,3, 5], [5, 6, 7, 8]);
+								if Determinant(ml2)*Determinant(mr2) eq 0 then
+									ml3 := Submatrix(m, [1, 3, 4, 5], [1, 2, 3, 4]);
+									mr3 := Submatrix(m, [1, 3, 4, 5], [5, 6, 7, 8]);
+									if Determinant(ml3)*Determinant(mr3) eq 0 then
+										ml4 := Submatrix(m, [1, 2, 4, 5], [1, 2, 3, 4]);
+										mr4 := Submatrix(m, [1, 2, 4, 5], [5, 6, 7, 8]);
+										if Determinant(ml4)*Determinant(mr4) eq 0 then
+											ml5 := Submatrix(m, [2, 3, 4, 5], [1, 2, 3, 4]);
+											mr5 := Submatrix(m, [2, 3, 4, 5], [5, 6, 7, 8]);
+											if Determinant(ml5)*Determinant(mr5) eq 0 then
+												continue;
+											end if;
+											Append(~l, [ml5, mr5]);
+										end if;
+										Append(~l, [ml4, mr4]);
+									end if;
+									Append(~l, [ml3, mr3]);
+								end if;
+								Append(~l, [ml2, mr2]);							
+						end for;
+					end for;
+				end for;
+			end for;
+		end for;
+	end for;
+return l;
+end function;
+
+zB := ProbMatrixB();
+Search18B := function()
+	for i1 in [1..3120] do
+		for i2, i3, i4 in [1..24] do
+			m1 := HorizontalJoin([ll[i2], O, I, O]);
+			m2 := HorizontalJoin([O, ll[i3]*zB[i1][1], O, ll[i3]*zB[i1][2]]);
+			m3 := HorizontalJoin([O, ll[i4], O, O]);
+			m4 := HorizontalJoin([I, O, O, O]);
+			n := VerticalJoin([m1, m2, m3, m4]);
+			M := n^4;
+			if IsMDS_Branch5(M, 4) then
+				return [i1, i2, i3];
+			end if;
+		end for;
+	end for;
+	return true;
+end function;
+
+//A3,2 is permutation matrix, SLP program has totally 3 direct XOR operations
+ProbMatrixC := function()
+	l := [];
+	sss := [[1, 2], [1, 3], [1, 4], [2, 3], [2, 4], [3, 4], [5, 6], [5, 7], [5, 8], [6, 7], [6, 8], [7, 8], [1, 5], [1, 6], [1, 7], [1, 8], [2, 5], [2, 6], [2, 7], [2, 8], [3, 5], [3, 6], [3, 7], [3, 8], [4, 5], [4, 6], [4, 7], [4, 8]];
+	for t1 in [1..28] do
+		for t2 in [t1+1..28] do
+			for t3 in [t2+1..28] do				
+				u := v8;
+				t11 := sss[t1];
+				t22 := sss[t2];
+				t33 := sss[t3];					
+				u11 := u[t11[1]] + u[t11[2]];
+				u22 := u[t22[1]] + u[t22[2]];
+				u33 := u[t33[1]] + u[t33[2]];					
+				u cat:= [u11, u22, u33];					
+				for t5 in [1..10] do
+					for t6 in [t5+1..11] do
+						m := Matrix([u11, u22, u33]);
+						t7 := u[t5] + u[t6];
+					
+						if (t7 in u) or (Weight(t7) le 2) then 
+							continue;
+						else Append(~u, t7);
+						end if;
+							
+						for t4 in [1..11] do
+							for t8 in [t4+1..12] do
+								m := Matrix([u11, u22, u33, t7]);
+								t9 := u[t4] + u[t8];
+								if (t9 in u) or (Weight(t9) le 2) then
+									continue;
+								else Append(~u, t9);
+								end if;
+								m := VerticalJoin(m, t9);
+								ml1 := Submatrix(m, [1, 2, 3, 4], [1, 2, 3, 4]);
+								mr1 := Submatrix(m, [1, 2, 3, 4], [5, 6, 7, 8]);
+								if Determinant(ml1)*Determinant(mr1) eq 0 then
+									ml2 := Submatrix(m, [1, 2, 3, 5], [1, 2, 3, 4]);
+									mr2 := Submatrix(m, [1, 2 ,3, 5], [5, 6, 7, 8]);
+									if Determinant(ml2)*Determinant(mr2) eq 0 then
+										ml3 := Submatrix(m, [1, 3, 4, 5], [1, 2, 3, 4]);
+										mr3 := Submatrix(m, [1, 3, 4, 5], [5, 6, 7, 8]);
+										if Determinant(ml3)*Determinant(mr3) eq 0 then
+											ml4 := Submatrix(m, [1, 2, 4, 5], [1, 2, 3, 4]);
+											mr4 := Submatrix(m, [1, 2, 4, 5], [5, 6, 7, 8]);
+											if Determinant(ml4)*Determinant(mr4) eq 0 then
+												ml5 := Submatrix(m, [2, 3, 4, 5], [1, 2, 3, 4]);
+												mr5 := Submatrix(m, [2, 3, 4, 5], [5, 6, 7, 8]);
+												if Determinant(ml5)*Determinant(mr5) eq 0 then
+													continue;
+												end if;
+												Append(~l, [ml5, mr5]);
+											end if;
+											Append(~l, [ml4, mr4]);
+										end if;
+										Append(~l, [ml3, mr3]);
+									end if;
+									Append(~l, [ml2, mr2]);	
+								end if;									
+								Append(~l, [ml1, mr1]);	
+							end for;
+						end for;
+					end for;			
+				end for;	
+				
+			end for;
+		end for;
+	end for;	
+	
+return l;
+end function;
+
+//
+zC := ProbMatrixC();
+Search18C := function()
+	for i1 in [1..3120] do
+		for i2, i3, i4 in [1..24] do
+			m1 := HorizontalJoin([ll[i2], O, I, O]);
+			m2 := HorizontalJoin([O, ll[i3]*zC[i1][1], O, ll[i3]*zC[i1][2]]);
+			m3 := HorizontalJoin([O, ll[i4], O, O]);
+			m4 := HorizontalJoin([I, O, O, O]);
+			n := VerticalJoin([m1, m2, m3, m4]);
+			M := n^4;
+			if IsMDS_Branch5(M, 4) then
+				return [i1, i2, i3];
+			end if;
+		end for;
+	end for;
+	return true;
+end function;

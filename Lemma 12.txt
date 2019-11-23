@@ -1,0 +1,109 @@
+//all nonsingular matrices with only 1 nonzero row-block in its first row
+SortY := function()
+V := [];	
+		for i2 in [1..65536] do
+			if Hw(l[i2]) eq 1 and l[i2][1] ne v0 and Weight(l[i2][1]) le 2 then
+				Append(~V, l[i2]);
+			end if;
+		end for;	
+	return V;
+end function;
+
+L := SortY();
+
+//all nonsingular matrices with 2 nonzero row-block in its first row and seconde row
+SortZ := function()
+V := [];
+	for i2 in [1..65536] do
+		if Hw(l[i2]) le 2 and l[i2][3] eq v0 and l[i2][4] eq v0 and Weight(l[i2][1]) le 2 and Weight(l[i2][2]) le 2 then
+			Append(~V, l[i2]);
+		end if;
+	end for;
+	return V;
+end function;
+
+L1 := SortZ();
+
+//all nonsingular matrices with weight 5 and additional 1 in its first row
+NOY := function()
+V := [];
+	for i1, i2, i3, i4 in FF4 do
+					v := Matrix([i1, i2, i3, i4]);
+					if HW(v) ne 5 then
+						continue;
+					end if;
+					if Determinant(v) eq 1 and Weight(v[1]) ne 1 then
+						Append(~V,v);
+					end if;				
+	end for;
+	return V;
+end function;
+
+NOXS := NOY();
+
+
+//Xor(M|A_1) = 1, take A_II as example, here we search for more simplified situation after permutation-equivalent operations on A_1,A_2,A_3,A_4
+Search12 := function()
+	for t in [4..65535] do
+		print t;  //53886
+		for i1 in [1..24] do
+			for i4 in [1..72] do
+				for i5 in [1..15] do					
+					r1 := HorizontalJoin([L[i5], ll[i1], O, O]);
+					r2 := HorizontalJoin([O,O,I,O]);
+					r3 := HorizontalJoin([O,O,O,I]);
+					r4 := HorizontalJoin([NOXS[i4], O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then 
+						return [i1,i4 ,i5, t];
+					end if;
+				end for;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+
+//Xor(M|A_1) = 1, take A_III as example
+Search12 := function()
+	for t in [4..65535] do
+		for i1 in [1..24] do
+			for i4 in [1..72] do
+				for i5 in [1..15] do					
+					r1 := HorizontalJoin([L[i5], ll[i1], O, O]);
+					r2 := HorizontalJoin([O,O,NOXS[i4],O]);
+					r3 := HorizontalJoin([O,O,O,I]);
+					r4 := HorizontalJoin([I, O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then 
+						return [i1, i4 ,i5, t];
+					end if;
+				end for;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+
+//Xor(M|A_1) = 2
+Search12 := function()
+	for t in [4..65535] do		
+			for i4 in [1..72] do
+				for i5 in [1..] do					
+					r1 := HorizontalJoin([L1[i5], NOXS[i4], O, O]);
+					r2 := HorizontalJoin([O,O,I,O]);
+					r3 := HorizontalJoin([O,O,O,I]);
+					r4 := HorizontalJoin([I, O, O, O]);
+					n := VerticalJoin([r1,r2,r3,r4]);
+					M := n^t;
+					if IsMDS_Branch5(M, 4) then 
+						return [i1, i2, i3 ,i4 ,i5, t];
+					end if;
+				end for;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;

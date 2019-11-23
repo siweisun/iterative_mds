@@ -1,0 +1,40 @@
+//sort all 4X4 binary matrices by their weight
+SortX := function()
+V := [];
+	for i1 in [1..16] do
+		for i2 in [1..65536] do
+			if HW(l[i2]) eq i1 then
+				Append(~V, l[i2]);
+			end if;
+		end for;
+	end for;
+	return V;
+end function;
+
+L := SortX();
+	
+//main procedure
+Search := function()
+//V := [];
+	for i2 in [1..65535] do
+		for i1 in [1..24] do
+			print [i2,i1];
+			r1 := HorizontalJoin([L[i2], I, O, O]);
+			r2 := HorizontalJoin([O,O,I,O]);
+			r3 := HorizontalJoin([O,O,O,I]);
+			r4 := HorizontalJoin([ll[i1], O, O, O]);
+			n := VerticalJoin([r1,r2,r3,r4]);
+			for t in [1..65535] do
+				M := n^t;
+				if IsMDS_Branch5(M, 4) then
+					//Append(~V, [i1, i2, t]);					
+					return [i1, i2, t];
+					//end if;
+				end if;
+			end for;
+		end for;
+	end for;
+	return true;
+end function;
+
+//return [24, 141, 451]
